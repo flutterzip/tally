@@ -154,16 +154,10 @@ class _PrintedReceiptState extends State<PrintedReceipt> with TickerProviderStat
                   child: Align(
                     alignment: Alignment.bottomCenter,
                     heightFactor: _out,
-                    child: Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        child!,
-                        Positioned(right: 22, bottom: 92, child: _Stamp(t: _stamp.value, text: widget.stamp, color: Palette.light.accent)),
-                      ],
-                    ),
+                    child: child,
                   ),
                 ),
-                child: _Paper(title: widget.title, amount: widget.amount, lines: widget.lines, code: widget.code),
+                child: _Paper(title: widget.title, amount: widget.amount, lines: widget.lines, code: widget.code, stamp: _stamp, stampText: widget.stamp),
               ),
             ),
           ),
@@ -176,10 +170,13 @@ class _PrintedReceiptState extends State<PrintedReceipt> with TickerProviderStat
 /// Thermal paper is white in any light, so the paper always uses the light
 /// palette.
 class _Paper extends StatelessWidget {
-  const _Paper({required this.title, required this.amount, required this.lines, required this.code});
+  const _Paper({required this.title, required this.amount, required this.lines, required this.code, required this.stamp, required this.stampText});
 
-  final String title, amount, code;
+  final String title, amount, code, stampText;
   final List<ReceiptLine> lines;
+
+  /// The stamp lands in its own blank band, clear of the text and barcode.
+  final Animation<double> stamp;
 
   @override
   Widget build(BuildContext context) {
@@ -218,7 +215,15 @@ class _Paper extends StatelessWidget {
               ),
             const SizedBox(height: 14),
             const _Dashes(color: Color(0xFFD5D1DD)),
-            const SizedBox(height: 18),
+            SizedBox(
+              height: 92,
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: stamp,
+                  builder: (_, _) => _Stamp(t: stamp.value, text: stampText, color: p.accent),
+                ),
+              ),
+            ),
             SizedBox(height: 46, child: CustomPaint(painter: _BarcodePainter(code, p.ink))),
             const SizedBox(height: 6),
             Text(code, textAlign: TextAlign.center, style: label.copyWith(letterSpacing: 3)),
