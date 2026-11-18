@@ -1,0 +1,32 @@
+{
+  "name": "Olympicson",
+  "avatar": "asset:people/olympicson.png",
+  "openingCents": 1248260,
+  "cards": [
+    { "id": "everyday", "name": "Everyday", "kind": "Debit", "number": "4929 1840 5521 7304", "expiry": "08/29", "cvv": "318", "tone": 0, "limitCents": 300000, "frozen": false },
+    { "id": "travel", "name": "Travel", "kind": "Credit", "number": "5412 7700 3195 2286", "expiry": "02/28", "cvv": "604", "tone": 2, "limitCents": 500000, "frozen": false },
+    { "id": "online", "name": "Online only", "kind": "Virtual", "number": "4024 0071 6612 9051", "expiry": "11/27", "cvv": "927", "tone": 3, "limitCents": 50000, "frozen": true }
+  ],
+  "contacts": [
+    { "id": "ada", "name": "Ada Nwosu", "handle": "@ada" , "tone": 0 },
+    { "id": "tomi", "name": "Tomi Bello", "handle": "@tomib", "tone": 1 },
+    { "id": "kemi", "name": "Kemi Adeyemi", "handle": "@kemi.a", "tone": 2 },
+    { "id": "musa", "name": "Musa Garba", "handle": "@musag", "tone": 3 },
+    { "id": "zara", "name": "Zara Okafor", "handle": "@zara", "tone": 1 }
+  ],
+  "transactions": [
+    { "id": "s1", "title": "Bean & Leaf", "category": "food", "cents": -640, "daysAgo": 0, "hour": 8, "card": "everyday" },
+    { "id": "s2", "title": "Metro card top up", "category": "transport", "cents": -2500, "daysAgo": 0, "hour": 7, "card": "everyday" },
+    { "id": "s3", "title": "Salary", "category": "income", "cents": 420000, "daysAgo": 1, "hour": 9 },
+    { "id": "s4", "title": "Kemi Adeyemi", "category": "transfer", "cents": -4500, "daysAgo": 1, "hour": 19, "contact": "kemi", "note": "Dinner" },
+    { "id": "s5", "title": "Fresh Market", "category": "food", "cents": -6830, "daysAgo": 2, "hour": 18, "card": "everyday" },
+    { "id": "s6", "title": "Cinema Nine", "category": "fun", "cents": -2400, "daysAgo": 2, "hour": 21, "card": "travel" },
+    { "id": "s7", "title": "Power and water", "category": "bills", "cents": -11200, "daysAgo": 3, "hour": 10, "card": "everyday" },
+    { "id": "s8", "title": "Thread & Co", "category": "shopping", "cents": -8900, "daysAgo": 4, "hour": 15, "card": "online" },
+    { "id": "s9", "title": "Ada Nwosu", "category": "transfer", "cents": 3000, "daysAgo": 4, "hour": 12, "contact": "ada", "note": "Tickets" },
+    { "id": "s10", "title": "City Rides", "category": "transport", "cents": -1850, "daysAgo": 5, "hour": 23, "card": "travel" },
+    { "id": "s11", "title": "Noodle Bar", "category": "food", "cents": -2260, "daysAgo": 5, "hour": 13, "card": "everyday" },
+    { "id": "s12", "title": "Phone plan", "category": "bills", "cents": -3500, "daysAgo": 6, "hour": 9, "card": "everyday" },
+    { "id": "s13", "title": "Bookshop", "category": "shopping", "cents": -2799, "daysAgo": 6, "hour": 16, "card": "travel" }
+  ]
+}
