@@ -136,6 +136,8 @@ void main() {
     expect(find.byType(SpendBars), findsOneWidget);
     expect(find.text('Spent today'), findsOneWidget);
     expect(find.byType(TxnRow), findsNWidgets(4));
+    // The filters live in the pinned bar, so they never scroll away.
+    expect(find.descendant(of: find.byType(TopChrome), matching: find.byType(ChoiceChip)), findsWidgets);
     await t.tap(find.byType(ChoiceChip).at(1));
     await t.pumpAndSettle();
     expect(find.byType(TxnRow), findsOneWidget);

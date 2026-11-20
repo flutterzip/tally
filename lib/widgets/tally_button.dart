@@ -292,3 +292,42 @@ class _DropsPainter extends CustomPainter {
   @override
   bool shouldRepaint(_DropsPainter old) => old.t != t;
 }
+
+/// What a primary action becomes once it has worked: the accent pill with a
+/// tick and what happened. Behind a [ParticleMorph], the button breaks apart
+/// and flies together as this.
+class DonePill extends StatelessWidget {
+  const DonePill({super.key, required this.label, this.height = Tokens.buttonHeight});
+
+  final String label;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Semantics(
+      liveRegion: true,
+      label: label,
+      excludeSemantics: true,
+      child: Container(
+        height: height,
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [p.accentGlow, p.accent]),
+          borderRadius: BorderRadius.circular(height / 2),
+          border: Border.all(color: p.accentDeep.withValues(alpha: 0.35)),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.check_circle_rounded, size: 22, color: p.onAccent),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.labelLarge!.copyWith(color: p.onAccent)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

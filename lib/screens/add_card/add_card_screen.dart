@@ -20,6 +20,7 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
   final cvv = TextEditingController();
   final label = TextEditingController();
   final cvvFocus = FocusNode();
+  final scroll = ScrollController();
   int tone = 1;
   bool tried = false, busy = false, done = false;
 
@@ -57,119 +58,138 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
 
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ListView(
-        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-        padding: EdgeInsets.fromLTRB(Tokens.gutter, MediaQuery.paddingOf(context).top + 8, Tokens.gutter, 130),
+      body: Stack(
         children: [
-          Row(
+          ListView(
+            controller: scroll,
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: EdgeInsets.fromLTRB(Tokens.gutter, TopChrome.extent(context) + 4, Tokens.gutter, MediaQuery.viewPaddingOf(context).bottom + 40),
             children: [
-              RoundButton(icon: Icons.arrow_back_rounded, label: 'Back', onTap: () => Navigator.of(context).pop()),
-              const SizedBox(width: 14),
-              Text('Add a card', style: text.titleLarge),
-            ],
-          ),
-          const SizedBox(height: 22),
-          FlipCard(
-            flipped: cvvFocus.hasFocus,
-            front: CardFace(
-              tone: tone,
-              name: label.text.trim().isEmpty ? 'New card' : label.text.trim(),
-              number: number.text,
-              expiry: expiry.text,
-              holder: holder.text,
-              masked: false,
-              width: width,
-            ),
-            back: CardBack(tone: tone, cvv: cvv.text, width: width, highlight: cvvFocus.hasFocus),
-          ),
-          const SizedBox(height: 18),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var t = 0; t < CardTones.count; t++)
-                Semantics(
-                  button: true,
-                  selected: t == tone,
-                  label: 'Card colour ${t + 1}',
-                  excludeSemantics: true,
-                  child: GestureDetector(
-                    onTap: () => setState(() => tone = t),
-                    child: AnimatedContainer(
-                      duration: Motion.medium,
-                      curve: Motion.spring,
-                      margin: const EdgeInsets.symmetric(horizontal: 7),
-                      width: t == tone ? 40 : 32,
-                      height: t == tone ? 40 : 32,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: LinearGradient(colors: CardTones.of(t)),
-                        border: Border.all(color: t == tone ? p.ink : Colors.transparent, width: 2.5),
+              FlipCard(
+                flipped: cvvFocus.hasFocus,
+                front: CardFace(
+                  tone: tone,
+                  name: label.text.trim().isEmpty ? 'New card' : label.text.trim(),
+                  number: number.text,
+                  expiry: expiry.text,
+                  holder: holder.text,
+                  masked: false,
+                  width: width,
+                ),
+                back: CardBack(tone: tone, cvv: cvv.text, width: width, highlight: cvvFocus.hasFocus),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  for (var t = 0; t < CardTones.count; t++)
+                    Semantics(
+                      button: true,
+                      selected: t == tone,
+                      label: 'Card colour ${t + 1}',
+                      excludeSemantics: true,
+                      child: GestureDetector(
+                        onTap: () => setState(() => tone = t),
+                        child: AnimatedContainer(
+                          duration: Motion.medium,
+                          curve: Motion.spring,
+                          margin: const EdgeInsets.symmetric(horizontal: 7),
+                          width: t == tone ? 40 : 32,
+                          height: t == tone ? 40 : 32,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            gradient: LinearGradient(colors: CardTones.of(t)),
+                            border: Border.all(color: t == tone ? p.ink : Colors.transparent, width: 2.5),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 22),
-          Entrance(
-            spacing: 14,
-            children: [
-              LabeledField(
-                label: 'Card number',
-                controller: number,
-                hint: '0000 0000 0000 0000',
-                keyboardType: TextInputType.number,
-                formatters: [DigitsFormatter(groupCardNumber)],
-                error: tried ? numberError : null,
-                onChanged: (_) => setState(() {}),
+                ],
               ),
-              LabeledField(
-                label: 'Name on card',
-                controller: holder,
-                hint: 'As it is printed',
-                capitalization: TextCapitalization.words,
-                onChanged: (_) => setState(() {}),
-              ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              const SizedBox(height: 22),
+              Entrance(
+                spacing: 14,
                 children: [
-                  Expanded(
-                    child: LabeledField(
-                      label: 'Expires',
-                      controller: expiry,
-                      hint: 'MM/YY',
-                      keyboardType: TextInputType.number,
-                      formatters: [DigitsFormatter(formatExpiry)],
-                      error: tried ? expiryError : null,
-                      onChanged: (_) => setState(() {}),
-                    ),
+                  LabeledField(
+                    label: 'Card number',
+                    controller: number,
+                    hint: '0000 0000 0000 0000',
+                    keyboardType: TextInputType.number,
+                    formatters: [DigitsFormatter(groupCardNumber)],
+                    error: tried ? numberError : null,
+                    onChanged: (_) => setState(() {}),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: LabeledField(
-                      label: 'Security code',
-                      controller: cvv,
-                      focusNode: cvvFocus,
-                      hint: '123',
-                      keyboardType: TextInputType.number,
-                      formatters: [DigitsFormatter((d) => d.length > 3 ? d.substring(0, 3) : d)],
-                      error: tried ? cvvError : null,
-                      onChanged: (_) => setState(() {}),
-                    ),
+                  LabeledField(
+                    label: 'Name on card',
+                    controller: holder,
+                    hint: 'As it is printed',
+                    capitalization: TextCapitalization.words,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: LabeledField(
+                          label: 'Expires',
+                          controller: expiry,
+                          hint: 'MM/YY',
+                          keyboardType: TextInputType.number,
+                          formatters: [DigitsFormatter(formatExpiry)],
+                          error: tried ? expiryError : null,
+                          onChanged: (_) => setState(() {}),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: LabeledField(
+                          label: 'Security code',
+                          controller: cvv,
+                          focusNode: cvvFocus,
+                          hint: '123',
+                          keyboardType: TextInputType.number,
+                          formatters: [DigitsFormatter((d) => d.length > 3 ? d.substring(0, 3) : d)],
+                          error: tried ? cvvError : null,
+                          onChanged: (_) => setState(() {}),
+                        ),
+                      ),
+                    ],
+                  ),
+                  LabeledField(
+                    label: 'Call it',
+                    controller: label,
+                    hint: 'Groceries, Travel, Rent',
+                    capitalization: TextCapitalization.sentences,
+                    textInputAction: TextInputAction.done,
+                    onChanged: (_) => setState(() {}),
+                  ),
+                  const SizedBox(height: 4),
+                  // Added: the button breaks apart and flies together as the
+                  // done state, then the wallet opens with the card in front.
+                  ParticleMorph(
+                    duration: Motion.morph,
+                    child: done
+                        ? const DonePill(key: ValueKey('added'), label: 'Card added')
+                        : TallyButton(key: const ValueKey('add'), label: 'Add card', icon: Icons.add_card_rounded, busy: busy, onPressed: busy ? null : add),
                   ),
                 ],
               ),
-              LabeledField(
-                label: 'Call it',
-                controller: label,
-                hint: 'Groceries, Travel, Rent',
-                capitalization: TextCapitalization.sentences,
-                textInputAction: TextInputAction.done,
-                onChanged: (_) => setState(() {}),
-              ),
-              const SizedBox(height: 4),
-              TallyButton(label: 'Add card', icon: Icons.add_card_rounded, busy: busy, done: done, onPressed: busy || done ? null : add),
             ],
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: TopChrome(
+              controller: scroll,
+              row: Row(
+                children: [
+                  RoundButton(icon: Icons.arrow_back_rounded, label: 'Back', onTap: () => Navigator.of(context).pop()),
+                  const SizedBox(width: 14),
+                  Text('Add a card', style: text.titleLarge),
+                ],
+              ),
+            ),
           ),
         ],
       ),
@@ -184,6 +204,7 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
     cvv.dispose();
     label.dispose();
     cvvFocus.dispose();
+    scroll.dispose();
     super.dispose();
   }
 }

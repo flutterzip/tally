@@ -9,8 +9,29 @@ import '../home/home_screen.dart';
 final tabProvider = StateProvider<int>((_) => 0);
 
 /// The Home tab's own navigator: sending money and its receipt open inside
-/// the tab.
+/// the tab, and the bar slides away while they are open so their own
+/// actions can sit at the bottom.
 final homeNavigator = GlobalKey<NavigatorState>(debugLabel: 'home');
+
+/// Whether the Home tab has a page open over its home.
+class _Depth extends NavigatorObserver {
+  final deep = ValueNotifier(false);
+  var _n = 0;
+
+  void _set(int n) {
+    _n = n;
+    deep.value = _n > 1;
+  }
+
+  @override
+  void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) => _set(_n + 1);
+
+  @override
+  void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) => _set(_n - 1);
+
+  @override
+  void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) => _set(_n - 1);
+}
 
 class Shell extends ConsumerStatefulWidget {
   const Shell({super.key});
@@ -21,7 +42,14 @@ class Shell extends ConsumerStatefulWidget {
 
 class _ShellState extends ConsumerState<Shell> {
   final _heroes = HeroController();
+  final _depth = _Depth();
   final _built = <int>{0};
+
+  @override
+  void dispose() {
+    _depth.deep.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,26 +67,36 @@ class _ShellState extends ConsumerState<Shell> {
               onPopWithResult: (_) => homeNavigator.currentState?.maybePop(),
               child: Navigator(
                 key: homeNavigator,
-                observers: [_heroes],
-                onGenerateRoute: (_) => TallyRoute<void>(const HomeScreen()),
+                observers: [_heroes, _depth],
+                onGenerateRoute: (_) => TallyRoute<void>(const StatusFrost(child: HomeScreen())),
               ),
             ),
           ),
-          _built.contains(1) ? const CardsScreen() : const SizedBox(),
+          _built.contains(1) ? const StatusFrost(child: CardsScreen()) : const SizedBox(),
           _built.contains(2) ? const ActivityScreen() : const SizedBox(),
         ],
       ),
-      bottomNavigationBar: GlassTabBar(
-        index: tab,
-        onTap: (i) {
-          if (i == tab && i == 0) homeNavigator.currentState?.popUntil((r) => r.isFirst);
-          ref.read(tabProvider.notifier).state = i;
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: _depth.deep,
+        builder: (context, deep, bar) {
+          final hide = deep && tab == 0;
+          return IgnorePointer(
+            ignoring: hide,
+            child: AnimatedSlide(offset: Offset(0, hide ? 1.2 : 0), duration: Motion.medium, curve: Motion.spring, child: bar),
+          );
         },
-        items: const [
-          TabItem('Home', Icons.home_outlined, Icons.home_rounded),
-          TabItem('Cards', Icons.credit_card_outlined, Icons.credit_card_rounded),
-          TabItem('Activity', Icons.bar_chart_outlined, Icons.bar_chart_rounded),
-        ],
+        child: GlassTabBar(
+          index: tab,
+          onTap: (i) {
+            if (i == tab && i == 0) homeNavigator.currentState?.popUntil((r) => r.isFirst);
+            ref.read(tabProvider.notifier).state = i;
+          },
+          items: const [
+            TabItem('Home', Icons.home_outlined, Icons.home_rounded),
+            TabItem('Cards', Icons.credit_card_outlined, Icons.credit_card_rounded),
+            TabItem('Activity', Icons.bar_chart_outlined, Icons.bar_chart_rounded),
+          ],
+        ),
       ),
     );
   }

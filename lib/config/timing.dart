@@ -18,8 +18,9 @@ abstract final class AppTiming {
   static Duration get addCard => _s(1000);
   static Duration get freeze => _s(500);
 
-  /// How long the button holds its tick before the next screen arrives.
-  static Duration get successBeat => _s(650);
+  /// How long the done state holds before the next screen arrives: the
+  /// button's particles fly together (`Motion.morph`), then a short look.
+  static Duration get successBeat => _s(1250);
 
   static Duration _s(int ms) =>
       Duration(microseconds: (ms * 1000 * scale).round());

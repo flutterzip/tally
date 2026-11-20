@@ -28,6 +28,9 @@ abstract final class Motion {
 
   static const shake = Duration(milliseconds: 520);
 
+  /// A button breaking into fragments that fly together as its done state.
+  static const morph = Duration(milliseconds: 900);
+
   static const enter = Curves.easeOutCubic;
   static const exit = Curves.easeInCubic;
   static const settle = Curves.easeOutQuart;
